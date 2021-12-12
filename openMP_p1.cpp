@@ -5,7 +5,7 @@
 #include<omp.h>
 #include<stdio.h>
 #include<stdlib.h>
-#define N 10
+#define N 10000
 int main()
 {
     int maxThreads = omp_get_max_threads();
@@ -14,8 +14,8 @@ int main()
     int *c = (int*)malloc(N * sizeof(int));
 
     for (int i = 0; i < N; i++) {
+        a[i] = (int*)malloc(N * sizeof(int));
         for (int j = 0; j < N; j++) {
-            a[i] = (int*)malloc(N * sizeof(int));
             a[i][j] = rand() % 100;
         }
         b[i] = rand() % 100;
@@ -31,7 +31,7 @@ int main()
         c[i] = 0;
         for (int j = 0; j < N; j++) {
             c[i] += a[i][j] * b[j];
-           printf("Thread num : %d\n", omp_get_thread_num());
+          // printf("Thread num : %d\n", omp_get_thread_num());
         }
     }
     double time_spent = 0.0;
