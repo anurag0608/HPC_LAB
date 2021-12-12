@@ -5,21 +5,32 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<omp.h>
-#define STEPS 100000
+#define STEPS 1000000
 int main()
 {
 	double step = (double)(1.0 / STEPS);
-	double x, pi, sum;
-	pi = 0.0;
-	sum = 0.0;
+	double x, pi;
+	
+	int NUM_THREADS = omp_get_num_threads();
+	//omp_set_num_threads(NUM_THREADS);
 
-	#pragma omp parallel for private(x)
-	for (int i = 0; i < STEPS; i++) {
-		x = (i + 0.5) * step;
-		#pragma omp critical
-		sum += 4.0 / (1.0 + x * x);
+	double* sum = (double*)malloc(NUM_THREADS * sizeof(double));
+	pi = 0.0;
+
+	#pragma omp parallel private(x)
+	{
+		int id = omp_get_thread_num();
+		int nt = omp_get_num_threads();
+		sum[id] = 0.0;
+		for (int i = id; i < STEPS; i += nt) {
+			x = (i + 0.5) * step;
+			sum[id] += (4.0 / (1 + x * x));
+		}
 	}
-	pi = step * sum;
-	printf("%f", pi);
+	for (int i = 0; i < NUM_THREADS; i++) {
+		//printf("%f ", sum[i]);
+		pi += sum[i] * step;
+	}
+	printf("PI : %f", pi);
 	return 0;
 }
