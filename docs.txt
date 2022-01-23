@@ -1,0 +1,67 @@
+mpi_init(int *argc, char ***argv)
+
+mpi_comm_size(mpi_comm comm, int *size)
+
+mpi_comm_rank(mpi_comm comm, int *rank);
+
+// send and receive to communicate bwt process with a domain
+
+/*SEND*/
+mpi_send(void *buf, int count, mpi_datatype datatype,
+        int dest, int tag, mpi_comm comm)
+
+buf => generic pointer which points to information stored in 
+      sender's memory
+count => count of num of primitive types data to be sent
+        like mpi_char, mpi_signed_char, mpi_int etc
+mpi_datatype => type of data to be sent
+
+example => buf would be my array of intergers of size 10
+then,
+buf = &array
+count = array.size
+datatype = mpi_int
+
+dest => rank of the process
+tag => generic premitive data for general use
+mpi_comm => MPI_COMM_WORLD
+
+/*receive*/
+int mpi_receive(void *buf, int count, MPI_DATATYPE datatype,
+                int source, int tag, MPI_COMM comm, MPI_STATUS *status)
+buf => points to memory location to store data received from other process
+... rest is same as send :)
+status => (its a structure ) gives info regarding success or failure of comm
+
+typedef struct MPI_STATUS {
+    int mpi_source,
+    int mpi_tag,
+    int mpi_error
+}
+MPI collective communication
+Collective communication is a method of communication which involves participation of all processes in a communicator.
+One of the things to remember about collective communication is that it implies a synchronization point among processes
+
+MPI_BARRIER
+MPI_Barrier can be useful for many things. 
+One of the primary uses of MPI_Barrier is to synchronize a program 
+so that portions of the parallel code can be timed accurately.
+
+MPI_BCast
+A broadcast is one of the standard collective communication techniques.
+During a broadcast, one process sends the same data to all processes in a communicator. 
+One of the main uses of broadcasting is to send out user input to a parallel program, or send out configuration parameters to all processes.
+
+MPI_Comm_split(
+	MPI_Comm comm,
+	int color,
+	int key,
+	MPI_Comm* newcomm)
+As the name implies, MPI_Comm_split creates new communicators by “splitting” a communicator into a group of sub-communicators based on the input values color and key. 
+It’s important to note here that the original communicator doesn’t go away, but a new communicator is created on each process.
+key, determines the ordering (rank) within each new communicator.
+
+0 1 2
+0 -> send receive
+1 -> send receive
+2 -> receive send
